@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {
   SafeAreaView,
@@ -17,11 +17,13 @@ import {
   useColorScheme,
   View,
   Button,
+  AppState,
+  Image
 } from 'react-native';
 
 
 
-import {gotoNativePhotoCapture} from "./bridgeJs/myNativeFunction"
+import {gotoNativePhotoCapture, getPhotoBase64} from "./bridgeJs/myNativeFunction"
 
 import {
   Colors,
@@ -33,10 +35,44 @@ import {
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
+  const [base64Photo, setBase64Photo] =  useState("");
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+
+  var eventListenerSubscription;
+
+  const _handleAppStateChange = nextAppState => {
+    console.log("status",nextAppState)
+    /*if (nextAppState === 'background') {
+      console.log("go activity")
+      setPhotoReady("shooting")
+    } else if (nextAppState === 'active' && photoReady === "shooting") {
+      var test =getPhotoBase64()
+      console.log("test", "photo ready", test.length)
+      setBase64Photo("data:image/png;base64,"+test)
+    }*/
+    if (nextAppState === 'active') {
+      var test =getPhotoBase64()
+      console.log("test", "photo ready", test.length)
+      setBase64Photo("data:image/png;base64,"+test)
+    }
+
+    
+  };
+
+
+  useEffect(() => {
+
+    console.log("debut")
+    //on mount
+    eventListenerSubscription = AppState.addEventListener('change', _handleAppStateChange);
+    return () => {
+      // on unmount
+      eventListenerSubscription.remove();
+    };
+  }, []);
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -45,10 +81,14 @@ const App = () => {
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
         <Header />
-        <View>
+        <View style={styles.container} >
           <Button title='Test' onPress={() => {
             gotoNativePhotoCapture()
           }}/>
+          { (base64Photo.length > 0) &&
+            <Image style={{width: 100, height: 200, resizeMode: "contain", borderWidth: 1, borderColor: 'red'}} source={{uri: base64Photo}}/>  
+          }
+          
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -56,22 +96,12 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
+  container: {
+    width:"100%",
+    height:300,
+    backgroundColor:"blue"
+
+  }
 });
 
 export default App;

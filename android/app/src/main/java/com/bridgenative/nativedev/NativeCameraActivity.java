@@ -13,11 +13,13 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 import android.Manifest;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 import com.bridgenative.R;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -72,10 +75,20 @@ public class NativeCameraActivity extends AppCompatActivity {
                                             Bitmap refBitmap = toBitmap(mediaImage);
 
                                             if(refBitmap != null){
-                                                Log.w(" photo ok","photo ok");
+                                                String imgbase64 = toBase64(refBitmap);
+                                                //Log.w(" photo ok",imgbase64);
+                                                SharedPreferences photoSharingStorage = getSharedPreferences("photoStorage",MODE_PRIVATE);
+                                                SharedPreferences.Editor myEdit = photoSharingStorage.edit();
+
+                                                myEdit.putString("photoBase64",imgbase64);
+
+                                                myEdit.commit();
+
+                                                finish();
                                             }
-                                            imageProxy.close();
+
                                         }
+                                        imageProxy.close();
                                     }
                                     @Override
                                     public void onError(ImageCaptureException error) {
@@ -139,5 +152,12 @@ public class NativeCameraActivity extends AppCompatActivity {
 
         }
         return null;
+    }
+
+    private String toBase64(Bitmap imgBmp) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        imgBmp.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream .toByteArray();
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 }
