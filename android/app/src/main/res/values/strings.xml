@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">bridgeNative</string>
+    <string name="title_activity_native_camera">NativeCameraActivity</string>
+    <string name="photobtn">Prendre en photo</string>
+</resources>
