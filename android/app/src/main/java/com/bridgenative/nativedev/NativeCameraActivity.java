@@ -59,9 +59,11 @@ public class NativeCameraActivity extends AppCompatActivity {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
                 bindPreview(cameraProvider);
                 Button buttonPhoto = findViewById(R.id.photoBtn);
+                int colorClick = R.color.light_blue_600;
                 buttonPhoto.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        buttonPhoto.setBackgroundColor(getResources().getColor(colorClick));
                         Executor takePhotoExe = Executors.newSingleThreadExecutor();
                         imageCapture.takePicture(takePhotoExe,
                                 new ImageCapture.OnImageCapturedCallback() {
@@ -89,6 +91,7 @@ public class NativeCameraActivity extends AppCompatActivity {
 
                                         }
                                         imageProxy.close();
+
                                     }
                                     @Override
                                     public void onError(ImageCaptureException error) {

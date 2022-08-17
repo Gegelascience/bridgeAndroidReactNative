@@ -12,7 +12,6 @@ import com.facebook.react.bridge.ReactMethod;
 
 public class CustomModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
-    boolean isPhotoReady = false;
 
     String photoB64 = "";
 
@@ -28,21 +27,22 @@ public class CustomModule extends ReactContextBaseJavaModule implements Lifecycl
 
     @ReactMethod
     public void goToNativeActivity() {
-        isPhotoReady = false;
+        photoB64 = "";
         Activity reactActivity = getCurrentActivity();
         Intent customIntent = new Intent(reactActivity,NativeCameraActivity.class);
         customIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         reactActivity.startActivity(customIntent);
 
     }
-    @ReactMethod(isBlockingSynchronousMethod = true)
-    public boolean getPhotoStatus() {
-        return isPhotoReady;
-    }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
     public String getPhotoBase64(){
         return photoB64;
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public void clearPhotoBase64() {
+        photoB64 = "";
     }
 
     @Override

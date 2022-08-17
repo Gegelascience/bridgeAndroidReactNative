@@ -27,9 +27,7 @@ import {gotoNativePhotoCapture, getPhotoBase64} from "./bridgeJs/myNativeFunctio
 
 import {
   Colors,
-  
   Header,
-  
 } from 'react-native/Libraries/NewAppScreen';
 
 
@@ -44,19 +42,16 @@ const App = () => {
   var eventListenerSubscription;
 
   const _handleAppStateChange = nextAppState => {
-    console.log("status",nextAppState)
-    /*if (nextAppState === 'background') {
-      console.log("go activity")
-      setPhotoReady("shooting")
-    } else if (nextAppState === 'active' && photoReady === "shooting") {
-      var test =getPhotoBase64()
-      console.log("test", "photo ready", test.length)
-      setBase64Photo("data:image/png;base64,"+test)
-    }*/
+    // si l'activité react est en focus on recupère la potentielle photo
     if (nextAppState === 'active') {
       var test =getPhotoBase64()
-      console.log("test", "photo ready", test.length)
-      setBase64Photo("data:image/png;base64,"+test)
+      if (test.length > 0) {
+        //console.log("test", "photo ready", test.length)
+        setBase64Photo("data:image/png;base64,"+test)
+      } else {
+        setBase64Photo("")
+      }
+      
     }
 
     
@@ -65,7 +60,6 @@ const App = () => {
 
   useEffect(() => {
 
-    console.log("debut")
     //on mount
     eventListenerSubscription = AppState.addEventListener('change', _handleAppStateChange);
     return () => {
@@ -86,7 +80,7 @@ const App = () => {
             gotoNativePhotoCapture()
           }}/>
           { (base64Photo.length > 0) &&
-            <Image style={{width: 100, height: 200, resizeMode: "contain", borderWidth: 1, borderColor: 'red'}} source={{uri: base64Photo}}/>  
+            <Image style={{width: 250, height: 450, resizeMode: "cover", borderWidth: 1, borderColor: 'red'}} source={{uri: base64Photo}}/>  
           }
           
         </View>
@@ -98,7 +92,7 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     width:"100%",
-    height:300,
+    height:500,
     backgroundColor:"blue"
 
   }
